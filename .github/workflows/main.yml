@@ -16,7 +16,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
       - name: Instalar dependências
         run: npm install
@@ -24,11 +23,16 @@ jobs:
       - name: Compilar o jogo
         run: npm run build
 
-      - name: Guardar arquivos compilados
+      - name: Criar ZIP do jogo compilado
+        run: |
+          mkdir -p package
+          if [ -d dist ]; then cp -r dist package/; fi
+          if [ -d public ]; then cp -r public package/; fi
+          cd package
+          zip -r ../opensonic-ready.zip .
+
+      - name: Disponibilizar ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: opensonic-js-build
-          path: |
-            dist/
-            public/
-          if-no-files-found: error
+          name: opensonic-ready
+          path: opensonic-ready.zip
